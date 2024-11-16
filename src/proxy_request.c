@@ -1,37 +1,26 @@
 #include "../include/proxy_request.h"
 
-// Implement our request function
-Request *request(const char *destIP, const int destPort) {
+// Implement request function
+proxy_request request(const char *ip, const int port) {
+    
+    proxy_request req;
 
-    // Initialize our request
-    Request *request;
+    req.vn = SOCKS_VERSION;
+    req.cd = SOCKS_CD;
+    req.dstip = inet_addr(ip);
+    req.dstport = htons(port);
+    req.userid[0] ='\0';
 
-    request = (Request*)malloc(sizeof(Request));
-
-    if(request == NULL) {
-        free(request);
-        return NULL;
-    }
-
-    request->vn = 4; 
-    request->cd = 1;
-    request->dstPort = htons(destPort);
-    request->dstIP = inet_addr(destIP);
-    request->userid[1] = '\0';
-
-    return request;
-
+    return req; 
 }
 
-// Get the size of our struct
-size_t structSizeRequest() {
+// Function to send the request
+int send_request(int fd, proxy_request *req) {
 
-    size_t vn_size = sizeof(unsigned char);
-    size_t cd_size = sizeof(unsigned char);
-    size_t dst_port_size = sizeof(unsigned short int);
-    size_t dst_ip_size = sizeof(unsigned int);
-
-    size_t sum = vn_size + cd_size + dst_port_size + dst_ip_size;
-    return sum;
-    
+    ssize_t bytes_written = write(fd, req, sizeof(*req));
+    if (bytes_written < 0) {
+        perror("Unable to send request");
+        return -1;
+    }
+    return 0;
 }

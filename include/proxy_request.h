@@ -3,23 +3,27 @@
 #ifndef PROXY_REQUEST_H
 #define PROXY_REQUEST_H
 
-#include <stdlib.h>
+#include <string.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-struct ProxyRequest {
-    unsigned char vn;
-    unsigned char cd;
-    unsigned short int dstPort;
-    unsigned int dstIP; 
-    char userid[2];
-};
-typedef struct ProxyRequest Request; 
+#include "constants.h"
+
+typedef struct {
+    uint8_t vn;
+    uint8_t cd;
+    uint16_t dstport;
+    uint32_t dstip;
+    char userid[1];
+} proxy_request; 
 
 // Define our request function
-Request *request(const char *, const int);
+proxy_request request(const char *, const int);
 
-// Get the size of our struct
-size_t structSizeRequest(void);
+// Send request function
+int send_request(int, proxy_request*);
 
 
 #endif 

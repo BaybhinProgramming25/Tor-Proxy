@@ -3,21 +3,24 @@
 #ifndef PROXY_RESPONSE_H
 #define PROXY_RESPONSE_H
 
-#include <stdlib.h>
+#include <string.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-struct ProxyResponse {
-    unsigned char vn;
-    unsigned char cd;
-    unsigned short int dstPort;
-    unsigned int dstIP;
-};
-typedef struct ProxyResponse Response; 
 
-// Definr our response function
+#include "constants.h"
 
-// Get the struct size
-size_t structSizeResponse(void);
+typedef struct {
+    uint8_t vn;
+    uint8_t cd;
+    uint16_t dstport;
+    uint32_t dstip;
+} proxy_response; 
+
+// Receive response function
+int receive_response(int, proxy_response*);
 
 
 #endif 

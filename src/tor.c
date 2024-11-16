@@ -11,80 +11,69 @@
 
 #include "../include/proxy_request.h"
 #include "../include/proxy_response.h"
+#include "../include/constants.h"
 
 
 int main(int argc, char *argv[]) {
-
-    // Check to see if we pass in the correct number of arguments
+    // Check arguments
     if (argc < 3) {
-        fprintf(stderr, "Insufficent arguments provided. Please provide: <host> & <port>");
+        fprintf(stderr, "Insufficient arguments provided. Please provide: <host> & <port>\n");
         return -1;
     }
 
     // Initialization
-    char *hostname = NULL;
-    int port = -1;
+    char *hostname = argv[1];
+    int port = atoi(argv[2]);
 
-    // Set respective variables to the ones in argc
-    hostname = argv[1];
-    port = atoi(argv[2]);
-
-
-    // 1) Create socket
+    // Create socket
     int fd = socket(AF_INET, SOCK_STREAM, 0);
-    if(fd < 0) {
-        fprintf(stderr, "Error in creating socket");
+    if (fd < 0) {
+        fprintf(stderr, "Error in creating socket\n");
         return -1;
     }
 
     // Define our socket struct
-    struct sockaddr_in socket;
-    memset(&socket, 0, sizeof(socket));
-    socket.sin_family = AF_INET;
-    socket.sin_port = htons(9050); // Tor runs on this port
-    socket.sin_addr.s_addr = inet_addr("127.0.0.1"); // Loop back address
+    struct sockaddr_in proxy_addr;
+    memset(&proxy_addr, 0, sizeof(proxy_addr));
+    proxy_addr.sin_family = AF_INET;
+    proxy_addr.sin_port = htons(9050);  // Use the port from command line
+    proxy_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    // Connect 
-    if(connect(fd, (struct sockaddr *)&socket, sizeof(socket)) < 0) {
-        fprintf(stderr, "Error in connecting");
-        close(fd);
-        return -1; 
-    }
-
-    // Begin making our request 
-    Request *req;
-    req = request(hostname, port);
-    if(req == NULL) {
-        close(fd);
-        return -1; 
-    }
-
-
-    // Make write system call
-    size_t req_side = structSizeRequest();
-    write(fd, req, req_side);
-
-    
-    uint8_t response[8];
-    if(read(fd, response, sizeof(response)) < 0) {
-        fprintf(stderr, "Error in reading");
-        free(req);
+    // Connect
+    if(connect(fd, (struct sockaddr*)&proxy_addr, sizeof(proxy_addr)) < 0) {
+        perror("Error connecting to SOCKS4 proxy\n");
         close(fd);
         return -1;
     }
 
-    if(response[1] == 90) {
-        fprintf(stdout, "CD equals 90");
+    // Make a request
+    proxy_request req = request(hostname, port);
+ 
+    // Send request
+    if(send_request(fd, &req) < 0) {
+        close(fd);
+        return -1;
     }
 
-    printf("%u\n", response[0]);
-    printf("%u\n", response[1]);
+    // Construct response
+    proxy_response res;
+    if(receive_response(fd, &res)) {
+        close(fd);
+        return -1;
+    }
 
- 
+    printf("Response code: %u\n", res.cd);
+    if (res.cd == SOCKS_REQUEST_GRANTED) {
+        printf("Successfully connected to %s:%d through SOCKS proxy\n", 
+               hostname, port);
+    } else {
+        printf("SOCKS proxy connection failed (response code: %u)\n", res.cd);
+        close(fd);
+        return -1;
+    }
 
-    // Clean up once we are done 
-    free(req); 
+    // Clean up
     close(fd);
     return 0;
-
+   
 }

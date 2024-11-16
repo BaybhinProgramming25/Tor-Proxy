@@ -1,17 +1,12 @@
 #include "../include/proxy_response.h"
 
-// Response might not need an implementation 
 
-
-// Get struct size response
-size_t structSizeResponse(void) {
-
-    size_t vn_size = sizeof(unsigned char);
-    size_t cd_size = sizeof(unsigned char);
-    size_t dst_port_size = sizeof(unsigned short int);
-    size_t dst_ip_size = sizeof(unsigned int);
-
-    size_t sum = vn_size + cd_size + dst_port_size + dst_ip_size;
-    return sum;
-
+// Receive a response 
+int receive_response(int fd, proxy_response* res) {
+    ssize_t bytes_read = read(fd, res, sizeof(*res));
+    if (bytes_read < 0) {
+        perror("Failed to read request");
+        return -1;
+    }
+    return 0;
 }
