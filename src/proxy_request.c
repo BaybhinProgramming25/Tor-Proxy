@@ -17,10 +17,26 @@ proxy_request request(const char *ip, const int port) {
 // Function to send the request
 int send_request(int fd, proxy_request *req) {
 
-    ssize_t bytes_written = write(fd, req, sizeof(*req));
-    if (bytes_written < 0) {
-        perror("Unable to send request");
-        return -1;
+    // Make sure we write all the bytes 
+    size_t totalBytesWritten = 0;
+    size_t count = sizeof(*req);
+    while(totalBytesWritten < count) {
+        ssize_t bytes_written = write(fd, req + totalBytesWritten, count - totalBytesWritten);
+
+        if(bytes_written <= 0) {
+            if(bytes_written == 0){
+                // EOF most likely reached
+                break;
+            }
+            if(errno == EINTR) {
+                // Some error happened, but we still continue 
+                continue;
+            }
+            perror("Unable to send request");
+            return -1; 
+        }
+        totalBytesWritten += bytes_written; 
     }
+
     return 0;
 }
