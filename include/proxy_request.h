@@ -17,7 +17,7 @@ typedef struct {
     uint8_t cd;
     uint16_t dstport;
     uint32_t dstip;
-    char userid[1];
+    char userid[1]; // Set character length to 1 for now 
 } proxy_request; 
 
 // Define our request function
