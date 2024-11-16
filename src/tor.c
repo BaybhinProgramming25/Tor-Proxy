@@ -1,17 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <errno.h>
-
-
 #include "../include/proxy_request.h"
 #include "../include/proxy_response.h"
-#include "../include/constants.h"
 
 
 int main(int argc, char *argv[]) {
