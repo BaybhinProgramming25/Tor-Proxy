@@ -1,76 +1,57 @@
-# Will need to eventually learn all this which will be another thing for later 
-# Compiler settings
-CXX := g++
-CXXFLAGS := -Wall -Wextra -Werror -Wpedantic -Wunused -g -Wno-unused-parameter
-SANITIZE := -fsanitize=address -fsanitize=undefined
+# Compiler and flags
+CC := gcc
+CFLAGS := -Wall -Wextra -Werror
+DEBUG_FLAGS := -g -O0 -DDEBUG
 
 # Directories
 SRC_DIR := src
-INC_DIR := include
 BUILD_DIR := build
 BIN_DIR := bin
+INC_DIR := include
 
-# Find all source and header files
+# Files
 SRCS := $(wildcard $(SRC_DIR)/*.c)
 HDRS := $(wildcard $(INC_DIR)/*.h)
-OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
+OBJS := $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+TARGET := $(BIN_DIR)/tpn
 
-# Final executable name
-TARGET := $(BIN_DIR)/program
-
-# Include directories
-INC_FLAGS := -I$(INC_DIR)
-
-# Debug flags
-DEBUG_FLAGS := -DDEBUG -g3 -O0
-RELEASE_FLAGS := -O3
-
-# Valgrind settings for memory leak detection
+# Valgrind configuration
 VALGRIND := valgrind
 VALGRIND_FLAGS := --leak-check=full --show-leak-kinds=all --track-origins=yes
 
-# Default build type
-BUILD_TYPE ?= release
+# Default build
+all: release
 
-ifeq ($(BUILD_TYPE),debug)
-    CXXFLAGS += $(DEBUG_FLAGS) $(SANITIZE)
-else
-    CXXFLAGS += $(RELEASE_FLAGS)
-endif
+# Create necessary directories
+$(BUILD_DIR):
+	@mkdir -p $(BUILD_DIR)
 
-# Make sure these directories exist
-$(shell mkdir -p $(BUILD_DIR) $(BIN_DIR))
-
-# Primary targets
-.PHONY: all clean debug release run valgrind
-
-all: $(TARGET)
+$(BIN_DIR):
+	@mkdir -p $(BIN_DIR)
 
 # Debug build
-debug: clean
-	@$(MAKE) BUILD_TYPE=debug all
+debug: CFLAGS += $(DEBUG_FLAGS)
+debug: $(BUILD_DIR) $(BIN_DIR) $(TARGET)
 
 # Release build
-release: clean
-	@$(MAKE) BUILD_TYPE=release all
+release: $(BUILD_DIR) $(BIN_DIR) $(TARGET)
 
-# Build object files
+# Compile source files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(HDRS)
 	@echo "Compiling $<..."
-	@$(CXX) $(CXXFLAGS) $(INC_FLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
 
-# Link the executable
+# Link object files
 $(TARGET): $(OBJS)
 	@echo "Linking $@..."
-	@$(CXX) $(OBJS) $(CXXFLAGS) -o $@
-	@echo "Build complete!"
+	@$(CC) $(OBJS) -o $@
 
 # Run the program
 run: $(TARGET)
 	@echo "Running $(TARGET)..."
 	@./$(TARGET)
 
-# Run with valgrind
+# Run with Valgrind
 valgrind: $(TARGET)
 	@echo "Running valgrind..."
 	@$(VALGRIND) $(VALGRIND_FLAGS) ./$(TARGET)
@@ -85,11 +66,11 @@ vars:
 	@echo "Sources: $(SRCS)"
 	@echo "Headers: $(HDRS)"
 	@echo "Objects: $(OBJS)"
-	@echo "Flags: $(CXXFLAGS)"
+	@echo "Flags: $(CFLAGS)"
 
 # Combined targets
 .PHONY: clean-debug-run clean-debug-valgrind
-
 clean-debug-run: clean debug run
-
 clean-debug-valgrind: clean debug valgrind
+
+.PHONY: all debug release clean vars run valgrind
