@@ -86,7 +86,7 @@ In the terminal, you will be presented with either one of the four status codes:
 - 92: Request rejected because SOCKS server was unable to connect to identd on the client 
 - 93: Request rejected because client program and identd reported different user-ids
 
-These response codes reflect the __SOCKS4 Protocol__. You can learn more about SOCKS4 [here][https://www.openssh.com/txt/socks4.protocol]
+These response codes reflect the __SOCKS4 Protocol__. You can learn more about SOCKS4 [Here][https://www.openssh.com/txt/socks4.protocol]
 
 
 ### Option #2: Shared Library 
