@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <netinet/in.h>
 
 #include "constants.h"
 
@@ -21,7 +22,7 @@ typedef struct {
 } proxy_request; 
 
 // Define our request function
-proxy_request request(const char *, const int);
+proxy_request request(struct sockaddr_in*);
 
 // Send request function
 int send_request(int, proxy_request*);
