@@ -8,6 +8,8 @@
 // Turn this into a shared library 
 int connect(int sck2, const struct sockaddr* sck_struct, socklen_t addr_len) {
 
+    printf("Address length: %u\n", (unsigned int)addr_len);
+
     // Make a function pointer to connect
     int (*orig_connect)(int, const struct sockaddr*, socklen_t);
 

@@ -1,5 +1,7 @@
 # Ignore bin folder
-bin/
+src/compiled-binary/bin/
+src/shared-library/bin/
+src/shared-library/build/
 
 # Ignore build folder
 build/

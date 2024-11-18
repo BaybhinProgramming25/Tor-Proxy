@@ -46,6 +46,18 @@ netstat -tuln | grep 9050
 
 ### Option #1: Compiled Binary 
 
+#### 1: Clone Repo
+
+```
+git clone <repo-url>
+cd tor-proxy/src
+```
+
+#### 2: Compile with make 
+
+```
+make --file=regular-progra
+
 
 ### Option #2: Shared Library 
 
