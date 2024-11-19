@@ -112,9 +112,18 @@ To run the tpn command with LD_PRELOAD, type the following:
 sudo LD_PRELOAD=./build/libtpn.so <package-manager-command> <destination-ip-address>
 ```
 
+Said package manager command could be curl, wget, npm, etc...
+
 Your shared library essentially gets treated as a preloader before the application actually executes any additional libraries
 
+### Option 3: (ALTERNATIVE) shared library apprach 
 
 
+#### 1: Compile with the shared library makefile 
+
+```
+make -f shared-library.mk
+```
 
 
+#### 2: Visit i
