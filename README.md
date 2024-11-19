@@ -86,10 +86,35 @@ In the terminal, you will be presented with either one of the four status codes:
 - 92: Request rejected because SOCKS server was unable to connect to identd on the client 
 - 93: Request rejected because client program and identd reported different user-ids
 
-These response codes reflect the __SOCKS4 Protocol__. You can learn more about SOCKS4 [Here][https://www.openssh.com/txt/socks4.protocol]
+These response codes reflect the __SOCKS4 Protocol__. You can learn more about SOCKS4 [Here](https://www.openssh.com/txt/socks4.protocol)
 
 
 ### Option #2: Shared Library 
+
+#### 1: Compile with the shared library makefile 
+
+```
+make -f shared-library.mk
+```
+
+This should create a .so (shared object) file titled __libtpn.so__ in the __build__ folder 
+
+Note: This makefile doesn't include the extra __clean__ and __debug__ commands, which is present in the other makefile 
+
+#### 2: Running with LD_PRELOAD
+
+LD_PRELOAD is a environment variable that allows you to load a custom shared library before any other libraries are executed. It is essentially making it so that
+whatever you defined in your program will execute first and then other libraries, if needed to be ran. 
+
+To run the tpn command with LD_PRELOAD, type the following:
+
+```
+sudo LD_PRELOAD=./build/libtpn.so <package-manager-command> <destination-ip-address>
+```
+
+Your shared library essentially gets treated as a preloader before the application actually executes any additional libraries
+
+
 
 
 
